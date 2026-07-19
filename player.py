@@ -5,41 +5,43 @@ import data
 pg.init()
 
 class Player: 
-  def __init__(self): 
-    self.SIZE: int = 64
+  def __init__(self, x, y): 
+    self.SIZE: int = 32
 
-    self.x = 0
-    self.y = data.read("window_size") - self.SIZE
+    self.position = pg.math.Vector2(x, y)
+    self.velocity = pg.math.Vector2(0, 0)
+    self.acceleration = pg.math.Vector2(0, 0)
 
-    self.direction = [0, 0]
+    self.HORIZONTAL_VELOCITY = 6
+    self.HORIZONTAL_FRICTION = 0.25
 
-    self.movement_speed = 400
-
-    self.bounds = pg.Rect(
-      self.x, 
-      self.y, 
-      self.SIZE, 
-      self.SIZE
-    )
+    self.bounds = pg.Rect(x, y, self.SIZE, self.SIZE)
+    self.bounds.topleft = (x, y)
 
   def handle_event(self, event: pg.Event): 
-    if event.type == pg.KEYDOWN: 
-      if event.key == pg.K_d: 
-        self.direction[0] = 1 
-      if event.key == pg.K_a: 
-        self.direction[0] = -1 
-      if event.key == pg.K_w: 
-        self.direction[1] = -1
+    pass
 
-    if event.type == pg.KEYUP:
-      self.direction[0] = 0
+  def move(self, delta: float, key):
+    self.acceleration = pg.math.Vector2(0, 0)
+    if key[pg.K_a]: 
+      self.acceleration.x = -1 * self.HORIZONTAL_VELOCITY
+    if key[pg.K_d]: 
+      self.acceleration.x = self.HORIZONTAL_VELOCITY
 
-  def move(self, delta: float):
-    self.x += self.movement_speed * self.direction[0] * delta    
-    self.y += self.movement_speed * self.direction[1] * delta    
+    self.acceleration.x -= self.velocity.x * self.HORIZONTAL_FRICTION
+    self.velocity += self.acceleration
+    self.position += self.velocity + 0.5 * self.acceleration
 
-    self.bounds.x = self.x
-    self.bounds.y = self.y
+    self.bounds.topleft = self.position
+
+  def jump(self, delta): 
+    pass
+
+  def update(self, delta): 
+    keys = pg.key.get_pressed()
+
+    self.move(delta, keys)
+    self.jump(delta)
 
   def draw(self, master: pg.Surface): 
     pg.draw.rect(master, (189, 189, 189), self.bounds)
