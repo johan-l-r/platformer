@@ -1,6 +1,7 @@
 import pygame as pg
 
 from data import read
+from player import Player
 from tile import Tile
 
 pg.init()
@@ -16,11 +17,7 @@ class TileMap:
     self.start_x: int = 0
     self.start_y: int = 0
 
-    self.tilemap = self.load_tiles()
-
-  def draw_tilemap(self, master: pg.Surface): 
-    for tile in self.tilemap: 
-      tile.draw(master)
+    self.tilemap: list[Tile] = self.load_tiles()
 
   def read_file(self): 
     with open(self.file_path, "r") as file: 
@@ -42,11 +39,10 @@ class TileMap:
 
       tilemap.append(row)
 
-    print(tilemap)
     return tilemap
 
   def load_tiles(self): 
-    tiles = []
+    tiles: list[Tile] = []
 
     x, y = 0, 0
 
@@ -57,8 +53,10 @@ class TileMap:
 
       for tile in row: 
         if tile == "0": 
+          # air 
           self.start_x, self.start_y = x * self.TILE_SIZE, y * self.TILE_SIZE
         elif tile == "1": 
+          # ground 
           tiles.append(Tile(x * self.TILE_SIZE, y * self.TILE_SIZE, (189, 189, 189)))
         elif tile == "2": 
           self.player_spawn = (
@@ -70,3 +68,13 @@ class TileMap:
       y += 1
 
     return tiles
+
+  def collide(self, other: Player): 
+    for tile in self.tilemap: 
+      if tile.bounds.colliderect(other.bounds): 
+        other.position.y = tile.bounds.top
+        other.velocity.y = 0
+
+  def draw_tilemap(self, master: pg.Surface): 
+    for tile in self.tilemap: 
+      tile.draw(master)

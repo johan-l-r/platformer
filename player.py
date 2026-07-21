@@ -8,31 +8,35 @@ class Player:
   def __init__(self, x, y): 
     self.SIZE: int = 32
 
-    self.position = pg.math.Vector2(x, y)
-    self.velocity = pg.math.Vector2(0, 0)
-    self.acceleration = pg.math.Vector2(0, 0)
+    # horizontal movement constants
+    self.HORIZONTAL_ACCELERATION: int = 60 # limit 
+    self.HORIZONTAL_FRICTION: float = 8
 
-    self.HORIZONTAL_VELOCITY = 6
-    self.HORIZONTAL_FRICTION = 0.25
+    # vertical movement constants
+    self.GRAVITY: float = 10
 
-    self.bounds = pg.Rect(x, y, self.SIZE, self.SIZE)
-    self.bounds.topleft = (x, y)
+    self.position: pg.math.Vector2 = pg.math.Vector2(x, y)
+    self.velocity: pg.math.Vector2 = pg.math.Vector2(0, 0)
+    self.acceleration: pg.math.Vector2 = pg.math.Vector2(0, 0)
 
-  def handle_event(self, event: pg.Event): 
-    pass
+    self.bounds: pg.Rect = pg.Rect(x, y, self.SIZE, self.SIZE)
+
+    self.bounds.bottomleft = (x, y)
 
   def move(self, delta: float, key):
-    self.acceleration = pg.math.Vector2(0, 0)
+    # gravity is always pushing down
+    self.acceleration = pg.math.Vector2(0, self.GRAVITY)
+
     if key[pg.K_a]: 
-      self.acceleration.x = -1 * self.HORIZONTAL_VELOCITY
+      self.acceleration.x = -1 * self.HORIZONTAL_ACCELERATION
     if key[pg.K_d]: 
-      self.acceleration.x = self.HORIZONTAL_VELOCITY
+      self.acceleration.x = self.HORIZONTAL_ACCELERATION
 
     self.acceleration.x -= self.velocity.x * self.HORIZONTAL_FRICTION
-    self.velocity += self.acceleration
-    self.position += self.velocity + 0.5 * self.acceleration
+    self.velocity += self.acceleration * delta 
+    self.position += self.velocity + 0.5 * self.acceleration * delta
 
-    self.bounds.topleft = self.position
+    self.bounds.bottomleft = self.position
 
   def jump(self, delta): 
     pass
