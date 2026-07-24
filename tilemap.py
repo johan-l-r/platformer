@@ -71,9 +71,19 @@ class TileMap:
 
   def collide(self, other: Player): 
     for tile in self.tilemap: 
-      if tile.bounds.colliderect(other.bounds): 
+      if tile.bounds.collidepoint(other.bounds.bottomleft): 
         other.position.y = tile.bounds.top
         other.velocity.y = 0
+
+      # collisions to the left 
+      if tile.bounds.collidepoint(other.bounds.topleft):
+        other.position.x = tile.bounds.right
+        other.bounds.x = other.position.x
+
+      # collisions to the left
+      if tile.bounds.collidepoint(other.bounds.topright):
+        other.position.x = tile.bounds.left - other.SIZE
+        other.bounds.x = other.position.x
 
   def draw_tilemap(self, master: pg.Surface): 
     for tile in self.tilemap: 

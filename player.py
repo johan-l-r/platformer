@@ -1,4 +1,5 @@
 import pygame as pg
+from pygame.key import ScancodeWrapper
 
 import data
 
@@ -13,24 +14,32 @@ class Player:
     self.HORIZONTAL_FRICTION: float = 8
 
     # vertical movement constants
-    self.GRAVITY: float = 10
+    self.GRAVITY: float = 100
 
     self.position: pg.math.Vector2 = pg.math.Vector2(x, y)
     self.velocity: pg.math.Vector2 = pg.math.Vector2(0, 0)
     self.acceleration: pg.math.Vector2 = pg.math.Vector2(0, 0)
+    self.direction = pg.math.Vector2(0, 0)
 
     self.bounds: pg.Rect = pg.Rect(x, y, self.SIZE, self.SIZE)
 
     self.bounds.bottomleft = (x, y)
 
-  def move(self, delta: float, key):
+  def move(
+    self, 
+    delta: float, 
+    key: ScancodeWrapper
+  ):
     # gravity is always pushing down
+    self.direction.x = 0
     self.acceleration = pg.math.Vector2(0, self.GRAVITY)
 
     if key[pg.K_a]: 
-      self.acceleration.x = -1 * self.HORIZONTAL_ACCELERATION
+      self.direction.x = -1
     if key[pg.K_d]: 
-      self.acceleration.x = self.HORIZONTAL_ACCELERATION
+      self.direction.x = 1
+
+    self.acceleration.x =self.direction.x * self.HORIZONTAL_ACCELERATION
 
     self.acceleration.x -= self.velocity.x * self.HORIZONTAL_FRICTION
     self.velocity += self.acceleration * delta 
@@ -38,7 +47,7 @@ class Player:
 
     self.bounds.bottomleft = self.position
 
-  def jump(self, delta): 
+  def jump(self, delta: float): 
     pass
 
   def update(self, delta): 

@@ -22,6 +22,7 @@ class Game:
 
   def update(self, delta): 
     self.player.update(delta)
+    self.tilemap.collide(self.player)
 
   def draw(self): 
     self.tilemap.draw_tilemap(self.window)

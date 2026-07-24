@@ -1,3 +1,4 @@
 {
-  "window_size": 800
+  "window_size": 800, 
+  "tile_size": 32
 }
